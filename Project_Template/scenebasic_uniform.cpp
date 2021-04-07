@@ -1,5 +1,16 @@
 #include "scenebasic_uniform.h"
 
+#include <imgui-1.79/imgui.h>
+#include <imgui-1.79/examples/imgui_impl_glfw.h>
+#include <imgui-1.79/examples/imgui_impl_opengl3.h>
+
+#include "GLFW/glfw3.h"
+#include "GLFW/glfw3.h"
+#include <glm/glm.hpp> //includes GLM
+#include "glm/fwd.hpp"
+#include <glm/gtc/type_ptr.hpp> // GLM: access to the value_ptr
+
+
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
@@ -20,6 +31,8 @@ using glm::vec4;
 using glm::mat4;
 using glm::mat3;
 
+bool trigger = false;
+
 #include "helper/glutils.h"
 
 std::unique_ptr<ObjMesh> pyramid;
@@ -27,18 +40,30 @@ std::unique_ptr<ObjMesh> staff;
 
 using glm::vec3;
 
+ImVec4 backgroundColour = ImVec4(0.06f, 0.015f, 0.0f, 1.0f);
+
 float x, z;
 
-SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f), tPrev(0.0f), rotSpeed(glm::pi<float>() / 18.0f), sky(100.0f)
+GLFWwindow* window;
+
+SceneBasic_Uniform::SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow) : angle(0.0f), tPrev(0.0f), rotSpeed(glm::pi<float>() / 18.0f), sky(100.0f)
 {
     pyramid = ObjMesh::load("media/pyr.obj", false, true);
     staff = ObjMesh::load("media/staff.obj", true);
+
+    window = sceneRunnerWindow;
+
+
+   
 }
+
+
 
 void SceneBasic_Uniform::initScene()
 {
 
     compile();
+
 
     glEnable(GL_DEPTH_TEST);
 
@@ -46,8 +71,13 @@ void SceneBasic_Uniform::initScene()
 
     view = glm::lookAt(vec3(0.5f, 0.75f, 0.75f), vec3(0.0f, 0.0f, 0.0f),vec3(0.0f, 1.0f, 0.0f));
     projection = mat4(1.0f);
+       
     
     
+
+    
+
+
     //ADD SPOTLIGHT
     prog.setUniform("Spot.L", vec3(1.0f, 0.0f, 0.3f));
     prog.setUniform("Spot.La", vec3(1.0f));
@@ -98,8 +128,53 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, dirt);
 
-   
+    
+    
 
+}
+
+
+void decorationMenu()
+{
+
+    //glfwPollEvents();
+    //glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+    //glClear(GL_COLOR_BUFFER_BIT);
+
+    //// feed inputs to dear imgui, start new frame
+    //ImGui_ImplOpenGL3_NewFrame();
+    //ImGui_ImplGlfw_NewFrame();
+    //ImGui::NewFrame();
+
+    //// rendering our geometries
+
+    //// render your GUI
+    //ImGui::Begin("Demo window");
+    //ImGui::Button("Hello!");
+    //ImGui::End();
+
+    //// Render dear imgui into screen
+    //ImGui::Render();
+    //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    //int display_w, display_h;
+    //glfwGetFramebufferSize(window, &display_w, &display_h);
+    //glViewport(0, 0, display_w, display_h);
+    //glfwSwapBuffers(window);
+
+    
+}
+
+void SceneBasic_Uniform::controls()
+{
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        trigger = true;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        trigger = false;
+    }
 
 }
 
@@ -121,14 +196,18 @@ void SceneBasic_Uniform::compile()
 void SceneBasic_Uniform::update( float t )
 {
     
-    float deltaT = t - tPrev;
-    if (tPrev == 0.0f)
-        deltaT = 0.0f;
-    tPrev = t;
-    angle += rotSpeed * deltaT;
-    if (angle > glm::two_pi<float>())
-        angle -= glm::two_pi<float>();
+    if (trigger == true)
+    {
+        float deltaT = t - tPrev;
+        if (tPrev == 0.0f)
+            deltaT = 0.0f;
+        tPrev = t;
+        angle += rotSpeed * deltaT;
+        if (angle > glm::two_pi<float>())
+            angle -= glm::two_pi<float>();
+    }
 
+    
 
 }
 
@@ -143,18 +222,21 @@ void SceneBasic_Uniform::render()
     mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
     prog.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
 
-    //Sets parameters for model and renders them
-    prog.setUniform("texID", 1);
-    prog.setUniform("Material.Kd", 0.8f, 0.8f, 0.8f);
-    prog.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
-    prog.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
-    prog.setUniform("Material.Shininess", 5.0f);
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, -1.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
-    setMatrices();
-    pyramid->render();
+
+    
+        //Sets parameters for model and renders them
+        prog.setUniform("texID", 1);
+        prog.setUniform("Material.Kd", 0.8f, 0.8f, 0.8f);
+        prog.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
+        prog.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
+        prog.setUniform("Material.Shininess", 5.0f);
+        model = mat4(1.0f);
+        model = glm::translate(model, vec3(0.0f, -1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
+        setMatrices();
+        pyramid->render();
+    
 
     //Sets parameters for model and renders them
     //Also Changes texID to choose a different texture
@@ -186,8 +268,8 @@ void SceneBasic_Uniform::render()
     setMatrices();
     sky.render();
 
-
    
+    controls();
     
 
 }

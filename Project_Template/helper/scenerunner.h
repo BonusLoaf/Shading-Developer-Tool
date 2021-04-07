@@ -2,6 +2,9 @@
 #include "scene.h"
 #include <GLFW/glfw3.h>
 #include "glutils.h"
+#include <imgui.h>
+#include <imgui-1.79/examples/imgui_impl_glfw.h>
+#include <imgui-1.79/examples/imgui_impl_opengl3.h>
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
@@ -13,11 +16,13 @@
 
 class SceneRunner {
 private:
-    GLFWwindow * window;
+    //GLFWwindow * window;
     int fbw, fbh;
 	bool debug;           // Set true to enable debug messages
 
 public:
+
+    GLFWwindow* window;
     SceneRunner(const std::string & windowTitle, int width = WIN_WIDTH, int height = WIN_HEIGHT, int samples = 0) : debug(true) {
         // Initialize GLFW
         if( !glfwInit() ) exit( EXIT_FAILURE );
@@ -48,6 +53,7 @@ public:
             exit( EXIT_FAILURE );
         }
         glfwMakeContextCurrent(window);
+
 
         // Get framebuffer size
         glfwGetFramebufferSize(window, &fbw, &fbh);

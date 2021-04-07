@@ -1,1 +1,2 @@
 E:\GitBackup\Shading-Initial-Prototype\Project_Template\x64\Debug\Project_Template.exe
+E:\GitBackup\Shading-Developer-Tool\Project_Template\x64\Debug\Project_Template.exe
