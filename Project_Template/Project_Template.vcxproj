@@ -120,7 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\GitBackup\Shading-Developer-Tool\Project_Template\packages;E:\GitBackup\Shading-Developer-Tool\Project_Template\packages\imgui-1.79;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\GitBackup\Shading-Developer-Tool\Project_Template\packages;E:\GitBackup\Shading-Developer-Tool\Project_Template\packages\imgui-1.79;E:\GitBackup\Shading-Developer-Tool\Project_Template\packages\imgui-1.79\examples;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +146,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\2020-comp3016-cw2-Artizazel\packages\imgui-1.79\examples\imgui_impl_opengl3.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
@@ -155,6 +156,12 @@
     <ClCompile Include="helper\texture.cpp" />
     <ClCompile Include="helper\trianglemesh.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="packages\imgui-1.79\examples\imgui_impl_glfw.cpp" />
+    <ClCompile Include="packages\imgui-1.79\imgui.cpp" />
+    <ClCompile Include="packages\imgui-1.79\imgui_demo.cpp" />
+    <ClCompile Include="packages\imgui-1.79\imgui_draw.cpp" />
+    <ClCompile Include="packages\imgui-1.79\imgui_impl_glfw.cpp" />
+    <ClCompile Include="packages\imgui-1.79\imgui_widgets.cpp" />
     <ClCompile Include="scenebasic_uniform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +185,8 @@
     <ClInclude Include="helper\texture.h" />
     <ClInclude Include="helper\trianglemesh.h" />
     <ClInclude Include="helper\utils.h" />
+    <ClInclude Include="packages\imgui-1.79\examples\imgui_impl_glfw.h" />
+    <ClInclude Include="packages\imgui-1.79\imgui_internal.h" />
     <ClInclude Include="scenebasic_uniform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

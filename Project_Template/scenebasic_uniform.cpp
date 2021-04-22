@@ -4,6 +4,7 @@
 #include <imgui-1.79/examples/imgui_impl_glfw.h>
 #include <imgui-1.79/examples/imgui_impl_opengl3.h>
 
+
 #include "GLFW/glfw3.h"
 #include "GLFW/glfw3.h"
 #include <glm/glm.hpp> //includes GLM
@@ -31,7 +32,7 @@ using glm::vec4;
 using glm::mat4;
 using glm::mat3;
 
-bool trigger = false;
+int shaderType = 2;
 
 #include "helper/glutils.h"
 
@@ -52,8 +53,6 @@ SceneBasic_Uniform::SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow) : angle(0.
     staff = ObjMesh::load("media/staff.obj", true);
 
     window = sceneRunnerWindow;
-
-
    
 }
 
@@ -64,6 +63,9 @@ void SceneBasic_Uniform::initScene()
 
     compile();
 
+    glfwInit();
+
+    glfwMakeContextCurrent(window);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -73,26 +75,57 @@ void SceneBasic_Uniform::initScene()
     projection = mat4(1.0f);
        
     
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
+
+    glClearColor(0.08f, 0.015f, 0.0f, 1.0f);
     
-
     
+    if (shaderType == 1)
+    {
+
+        prog.use();
+
+        //ADD SPOTLIGHT
+        prog.setUniform("Spot.L", vec3(1.0f, 0.0f, 0.3f));
+        prog.setUniform("Spot.La", vec3(1.0f));
+        prog.setUniform("Spot.Exponent", 50.0f);
+        prog.setUniform("Spot.Cutoff", glm::radians(2.0f));
+
+        //Add point light
+        prog.setUniform("Light.Position", (view * glm::vec4(x, 5.0f, 0.0, 0.0f)));
+
+        prog.setUniform("Light.L", vec3(0.9f));
+
+        prog.setUniform("Light.La", vec3(0.5f, 0.2f, 0.1f));
 
 
-    //ADD SPOTLIGHT
-    prog.setUniform("Spot.L", vec3(1.0f, 0.0f, 0.3f));
-    prog.setUniform("Spot.La", vec3(1.0f));
-    prog.setUniform("Spot.Exponent", 50.0f);
-    prog.setUniform("Spot.Cutoff", glm::radians(2.0f));
+    }
+    else
+    {
+        edgeProg.use();
 
-    //Add point light
-    prog.setUniform("Light.Position",(view * glm::vec4(x, 5.0f, 0.0, 0.0f)));
+        //ADD SPOTLIGHT
+        edgeProg.setUniform("Spot.L", vec3(1.0f, 0.0f, 0.3f));
+        edgeProg.setUniform("Spot.La", vec3(1.0f));
+        edgeProg.setUniform("Spot.Exponent", 50.0f);
+        edgeProg.setUniform("Spot.Cutoff", glm::radians(2.0f));
 
-    prog.setUniform("Light.L", vec3(0.9f));
+        //Add point light
+        edgeProg.setUniform("Light.Position", (view * glm::vec4(x, 5.0f, 0.0, 0.0f)));
 
-    prog.setUniform("Light.La", vec3(0.5f, 0.2f, 0.1f));
+        edgeProg.setUniform("Light.L", vec3(0.0f));
 
+        edgeProg.setUniform("Light.La", vec3(0.0f, 0.0f, 0.0f));
 
-
+    }
 
     //Locate all textures
     GLuint skybox = Texture::loadCubeMap("media/skybox/sand", ".png");
@@ -104,8 +137,6 @@ void SceneBasic_Uniform::initScene()
     GLuint normalMap = Texture::loadTexture("media/texture/normalMap.png");
 
     GLuint dirt = Texture::loadTexture("media/texture/dirt.png");
-
-
 
     // Load brick texture file into channel 0
     glActiveTexture(GL_TEXTURE0);
@@ -133,47 +164,43 @@ void SceneBasic_Uniform::initScene()
 
 }
 
-
-void decorationMenu()
-{
-
-    //glfwPollEvents();
-    //glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
-    //glClear(GL_COLOR_BUFFER_BIT);
-
-    //// feed inputs to dear imgui, start new frame
-    //ImGui_ImplOpenGL3_NewFrame();
-    //ImGui_ImplGlfw_NewFrame();
-    //ImGui::NewFrame();
-
-    //// rendering our geometries
-
-    //// render your GUI
-    //ImGui::Begin("Demo window");
-    //ImGui::Button("Hello!");
-    //ImGui::End();
-
-    //// Render dear imgui into screen
-    //ImGui::Render();
-    //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    //int display_w, display_h;
-    //glfwGetFramebufferSize(window, &display_w, &display_h);
-    //glViewport(0, 0, display_w, display_h);
-    //glfwSwapBuffers(window);
-
-    
-}
-
 void SceneBasic_Uniform::controls()
 {
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
-        trigger = true;
+        shaderType = 1;
+        prog.use();
+
+        //ADD SPOTLIGHT
+        prog.setUniform("Spot.L", vec3(1.0f, 0.0f, 0.3f));
+        prog.setUniform("Spot.La", vec3(1.0f));
+        prog.setUniform("Spot.Exponent", 50.0f);
+        prog.setUniform("Spot.Cutoff", glm::radians(2.0f));
+
+        //Add point light
+        prog.setUniform("Light.Position", (view * glm::vec4(x, 5.0f, 0.0, 0.0f)));
+
+        prog.setUniform("Light.L", vec3(0.9f));
+
+        prog.setUniform("Light.La", vec3(0.5f, 0.2f, 0.1f));
     }
-    else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     {
-        trigger = false;
+        shaderType = 2;
+        edgeProg.use();
+
+        //ADD SPOTLIGHT
+        edgeProg.setUniform("Spot.L", vec3(1.0f, 0.0f, 0.3f));
+        edgeProg.setUniform("Spot.La", vec3(1.0f));
+        edgeProg.setUniform("Spot.Exponent", 50.0f);
+        edgeProg.setUniform("Spot.Cutoff", glm::radians(2.0f));
+
+        //Add point light
+        edgeProg.setUniform("Light.Position", (view * glm::vec4(x, 5.0f, 0.0, 0.0f)));
+
+        edgeProg.setUniform("Light.L", vec3(0.0f));
+
+        edgeProg.setUniform("Light.La", vec3(0.0f, 0.0f, 0.0f));
     }
 
 }
@@ -186,6 +213,11 @@ void SceneBasic_Uniform::compile()
 		prog.link();
 		prog.use();
 
+
+        edgeProg.compileShader("shader/basic_uniform.vert");
+        edgeProg.compileShader("shader/basic_uniform.frag");
+        edgeProg.link();
+
         
 	} catch (GLSLProgramException &e) {
 		cerr << e.what() << endl;
@@ -195,8 +227,9 @@ void SceneBasic_Uniform::compile()
 
 void SceneBasic_Uniform::update( float t )
 {
-    
-    if (trigger == true)
+        
+
+    if (shaderType == 1)
     {
         float deltaT = t - tPrev;
         if (tPrev == 0.0f)
@@ -211,10 +244,101 @@ void SceneBasic_Uniform::update( float t )
 
 }
 
+
+void SceneBasic_Uniform::renderGUI()
+{
+
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+
+
+	glm::vec3 camZoom = glm::vec3(0, 0, 2);
+
+	static float backgroundValue = 0.0f;
+	static int counter = 0;
+
+	ImGui::Begin("Decoration Menu");
+
+	ImGui::Text("---------Controls(WASD)---------");
+
+	
+
+
+	ImGui::Text("---------Background---------");
+
+	
+
+	ImGui::Text("---------Baubles---------");
+
+
+	ImGui::Text("---------Toppers---------");
+
+	
+
+	ImGui::Text("---------Tinsel---------");
+
+
+	ImGui::Text("Level 4");
+	
+
+
+	ImGui::Text("Level 3");
+	
+
+	ImGui::Text("Level 2");
+	
+	
+
+
+	ImGui::Text("---------Clear---------");
+
+
+	if (ImGui::Button("Clear Tinsel"))
+	{
+	
+	}
+
+	if (ImGui::Button("Clear Baubles"))
+	{
+		
+	}
+
+	if (ImGui::Button("Clear Tree"))
+	{
+		
+	}
+
+
+	ImGui::End();
+
+
+	
+
+
+
+
+	ImGui::Render();
+	int display_w, display_h;
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+}
+
 void SceneBasic_Uniform::render()
 {
 
+    glfwMakeContextCurrent(window);
+
+    //glClearColor(0, 0, 0, 0);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    
+
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    
    
     //Set parameters for spotlight
     vec4 lightPos = vec4(15.0f, 15.0f, 0.0f, 1.0f);
@@ -262,15 +386,30 @@ void SceneBasic_Uniform::render()
         0.0f));
     
     
+    if (shaderType == 1)
+    {
+        prog.use();
+    }
+    else
+    {
+        edgeProg.use();
+    }
     
-    prog.use();
     model = mat4(1.0f);
     setMatrices();
     sky.render();
 
    
     controls();
-    
+
+
+    renderGUI();
+
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glfwPollEvents();
+
+    //glfwSwapBuffers(window);
 
 }
 

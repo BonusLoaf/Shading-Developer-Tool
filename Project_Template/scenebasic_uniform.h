@@ -27,7 +27,7 @@ private:
 
     glm::mat4 rotationMatrix;
 
-    GLSLProgram prog;
+    GLSLProgram prog, edgeProg;
 
     float angle, tPrev, rotSpeed;
 
@@ -39,6 +39,8 @@ private:
     std::unique_ptr<ObjMesh> staff;
 
     void setMatrices();
+
+    void renderGUI();
 
     void compile();
 

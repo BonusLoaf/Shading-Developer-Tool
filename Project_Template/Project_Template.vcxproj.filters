@@ -57,6 +57,27 @@
     <ClCompile Include="helper\skybox.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="packages\imgui-1.79\imgui_draw.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="packages\imgui-1.79\imgui_impl_glfw.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="packages\imgui-1.79\imgui_widgets.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="packages\imgui-1.79\imgui.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="packages\imgui-1.79\imgui_demo.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="packages\imgui-1.79\examples\imgui_impl_glfw.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\2020-comp3016-cw2-Artizazel\packages\imgui-1.79\examples\imgui_impl_opengl3.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag">
@@ -116,6 +137,12 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="helper\skybox.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="packages\imgui-1.79\imgui_internal.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="packages\imgui-1.79\examples\imgui_impl_glfw.h">
       <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
