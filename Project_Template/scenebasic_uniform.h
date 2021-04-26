@@ -37,8 +37,8 @@ private:
 
     SkyBox sky;
 
-    Torus torus;
-    Teapot teapot;
+    /*Torus torus;
+    Teapot teapot;*/
 
 
     std::unique_ptr<ObjMesh> pyramid;

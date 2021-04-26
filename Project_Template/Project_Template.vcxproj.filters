@@ -86,16 +86,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader\basic_uniform.frag">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="shader\basic_uniform.vert">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.frag">
       <Filter>shaders</Filter>
     </None>
     <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\basic_uniform.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\basic_uniform.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
