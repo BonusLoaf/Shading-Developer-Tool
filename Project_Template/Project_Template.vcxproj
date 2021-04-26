@@ -153,7 +153,9 @@
     <ClCompile Include="helper\objmesh.cpp" />
     <ClCompile Include="helper\skybox.cpp" />
     <ClCompile Include="helper\stb\stb_image.cpp" />
+    <ClCompile Include="helper\teapot.cpp" />
     <ClCompile Include="helper\texture.cpp" />
+    <ClCompile Include="helper\torus.cpp" />
     <ClCompile Include="helper\trianglemesh.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="packages\imgui-1.79\examples\imgui_impl_glfw.cpp" />
@@ -165,10 +167,10 @@
     <ClCompile Include="scenebasic_uniform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.frag" />
+    <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.vert" />
     <None Include="shader\basic_uniform.frag" />
     <None Include="shader\basic_uniform.vert" />
-    <None Include="shader\pyramid_uniform.frag" />
-    <None Include="shader\pyramid_uniform.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\aabb.h" />
@@ -181,8 +183,10 @@
     <ClInclude Include="helper\skybox.h" />
     <ClInclude Include="helper\stb\stb_image.h" />
     <ClInclude Include="helper\stb\stb_image_write.h" />
+    <ClInclude Include="helper\teapot.h" />
     <ClInclude Include="helper\teapotdata.h" />
     <ClInclude Include="helper\texture.h" />
+    <ClInclude Include="helper\torus.h" />
     <ClInclude Include="helper\trianglemesh.h" />
     <ClInclude Include="helper\utils.h" />
     <ClInclude Include="packages\imgui-1.79\examples\imgui_impl_glfw.h" />

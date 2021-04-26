@@ -78,6 +78,12 @@
     <ClCompile Include="..\..\2020-comp3016-cw2-Artizazel\packages\imgui-1.79\examples\imgui_impl_opengl3.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="helper\torus.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\teapot.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag">
@@ -86,10 +92,10 @@
     <None Include="shader\basic_uniform.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shader\pyramid_uniform.frag">
+    <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.frag">
       <Filter>shaders</Filter>
     </None>
-    <None Include="shader\pyramid_uniform.vert">
+    <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
@@ -143,6 +149,12 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="packages\imgui-1.79\examples\imgui_impl_glfw.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\torus.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\teapot.h">
       <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>

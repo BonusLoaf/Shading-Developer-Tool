@@ -10,6 +10,8 @@
 #include "helper/objmesh.h"
 #include "helper/skybox.h"
 #include <glm/glm.hpp>
+#include "helper/teapot.h"
+#include "helper/torus.h"
 
 #include <imgui-1.79/imgui.h>
 #include <imgui-1.79/examples/imgui_impl_glfw.h>
@@ -29,9 +31,14 @@ private:
 
     GLSLProgram prog, edgeProg;
 
+    GLuint fsQuad, fboHandle, renderTex;
+
     float angle, tPrev, rotSpeed;
 
     SkyBox sky;
+
+    Torus torus;
+    Teapot teapot;
 
 
     std::unique_ptr<ObjMesh> pyramid;
@@ -43,6 +50,10 @@ private:
     void renderGUI();
 
     void compile();
+    void setupFBO();
+
+    void pass1();
+    void pass2();
 
 public:
     SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow);
@@ -52,6 +63,7 @@ public:
     void render();
     void resize(int, int);
     void controls();
+
 };
 
 #endif // SCENEBASIC_UNIFORM_H
