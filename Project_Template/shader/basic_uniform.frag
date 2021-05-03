@@ -6,8 +6,6 @@ in vec3 Normal;
 in vec3 Vec;
 
 
-in vec3 LightDir;
-in vec3 ViewDir;
 
 uniform struct lightInfo
 {
@@ -26,128 +24,45 @@ vec3 Ks;
 float Shininess;
 }Material;
 
-
-uniform struct SpotLightInfo {
-vec3 Position;
-vec3 L;
-vec3 La;
-vec3 Direction;
-float Exponent;
-float Cutoff;
-} Spot;
-
-layout(binding=0) uniform samplerCube SkyBoxTex;
+//layout(binding=5) uniform samplerCube SkyBoxTex;
 layout(binding=1) uniform sampler2D PyTex;
 layout(binding=2) uniform sampler2D StaffTex;
-layout(binding=3) uniform sampler2D NormalMapTex;
-layout(binding=4) uniform sampler2D DirtTex;
+layout(binding=3) uniform sampler2D DirtTex;
+layout(binding=4) uniform sampler2D SandTex;
+layout( binding=0 ) uniform sampler2D Texture0;
+
 layout (location = 0) out vec4 FragColor;
 
 in vec2 TexCoord;
 
 vec3 TexColor = texture(PyTex, TexCoord).rgb;
-
 vec4 TexPyramid = texture(PyTex, TexCoord);
-
 vec4 TexOverlay = texture(DirtTex, TexCoord);
 
-vec3 blinnPhongModelWithNormal(vec3 LightDir, vec3 normal)
-{
+uniform float Weight[5];
+uniform float EdgeThreshold;
+uniform int Pass;
 
-
-
-
-TexColor = mix(TexPyramid.rgb, TexOverlay.rgb, TexOverlay.a);
-
-
-//Ambient
-vec3 ambient = Light.La * TexColor;
-
-//Diffuse
-vec3 s = normalize(vec3(Light.Position) - LightDir);
-
-float sDotN = dot(LightDir,normal);
-
-vec3 diffuse = TexColor * sDotN;
-
-//Specular
-
-//Calculate without shininess
-vec3 specular = Material.Ks * Light.L * sDotN;
-
-
-//Shininess
-if(sDotN > 0.0)
-{
-
-//Half Vector
-vec3 h = normalize(ViewDir+LightDir);
-
-
-//Calculate specular with Shininess
-specular = Material.Ks * pow(max(dot(h,normal),0.0), Material.Shininess);
-
-}
-
-return ambient + Light.L * (diffuse + specular);
-
-
-
-}
-
-vec3 blinnPhongSpot( vec3 position, vec3 n ) {
-
-
-
-//Ambient
-vec3 ambient = Spot.La * Material.Ka;
-
-
-
-//Diffuse
-vec3 s = normalize(vec3(Spot.Position) - position);
-
-float cosAng = dot(-s, normalize(Spot.Direction));
-
-float angle = acos(cosAng);
-
-float spotScale = 0.0f;
-
-vec3 diffuse = vec3(0.0);
-
-vec3 specular = vec3(0.0);
-
-
-if(angle < Spot.Cutoff)
-{
-
-spotScale = pow(cosAng, Spot.Exponent);
-float sDotN = dot(s,n);
-
-vec3 diffuse = Material.Kd * sDotN;
-
-if(sDotN > 0.0)
-{
-vec3 v = normalize(-position.xyz);
-vec3 h = normalize(v+s);
-specular = Material.Ks * pow(max(dot(h,n),0.0),Material.Shininess);
-
-}
-return ambient + spotScale * Spot.L * (diffuse + specular);
-}
-
-
-return ambient + spotScale * Spot.L * (diffuse + specular);
-
-}
+const vec3 lum = vec3(0.2126, 0.7152, 0.0722);
 
 
 vec3 blinnPhongModel(vec3 position, vec3 normal)
 {
 
 
-TexColor = texture(StaffTex, TexCoord).rgb;
 
+if(texID == 1)
+{
+TexColor = texture(PyTex, TexCoord).rgb;
+}
+else if(texID == 2)
+{
+TexColor = texture(StaffTex, TexCoord).rgb;
+}
+else if(texID == 3)
+{
+TexColor = texture(SandTex, TexCoord).rgb;
+}
 
 
 
@@ -190,40 +105,85 @@ return ambient + Light.L * (diffuse + specular);
 }
 
 
+
+//Lumincance function
+float luminance( vec3 color )
+{
+ return dot(lum,color);
+}
+
+
+vec4 pass1()
+{
+ return vec4(blinnPhongModel( Position, normalize(Normal) ),1.0);
+}
+
+//Calculates luminance for each pixel
+vec4 pass2()
+{
+ ivec2 pix = ivec2( gl_FragCoord.xy );
+ vec4 sum = texelFetch(Texture0, pix, 0) * Weight[0];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(0,1) ) * Weight[1];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(0,-1) ) * Weight[1];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(0,2) ) * Weight[2];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(0,-2) ) * Weight[2];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(0,3) ) * Weight[3];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(0,-3) ) * Weight[3];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(0,4) ) * Weight[4];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(0,-4) ) * Weight[4];
+ return sum;
+}
+
+
+vec4 pass3()
+{
+ ivec2 pix = ivec2( gl_FragCoord.xy );
+ vec4 sum = texelFetch(Texture0, pix, 0) * Weight[0];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(1,0) ) * Weight[1];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(-1,0) ) * Weight[1];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(2,0) ) * Weight[2];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(-2,0) ) * Weight[2];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(3,0) ) * Weight[3];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(-3,0) ) * Weight[3];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(4,0) ) * Weight[4];
+ sum += texelFetchOffset( Texture0, pix, 0, ivec2(-4,0) ) * Weight[4];
+ return sum;
+}
+
+
+
+
 void main() {
 
 
 if(texID > 0)
 {
 
-if(texID == 1)
+
+if( Pass == 1 )
 {
+FragColor = pass1();
+}
+ else if( Pass == 2 )
+{
+FragColor = pass2();
+}
+ else if( Pass == 3 )
+{
+FragColor = pass3();
+}
 
-//Calculate Normal Map
-vec3 norm = texture(NormalMapTex, TexCoord).xyz;
-//Set it between a range of 0 and 1
-norm.xy = 2.0 * norm.xy - 1.0f;
 
-//Add point light to spot light
-vec3 fullLightModel = blinnPhongSpot(Position, normalize(Normal)) + blinnPhongModelWithNormal(LightDir, normalize(norm));
 
-//Set pyramid shader
-    FragColor = vec4(fullLightModel,1.0);
+
+
 }
 else
 {
-//Set staff shader
-FragColor = vec4 (blinnPhongModel(Position, normalize(Normal)),1.0);
-}
-
-
-}
-else
-{
-vec3 texColor = texture(SkyBoxTex, normalize(Vec)).rgb;
-
-//Set skybox shader
-FragColor = vec4 (texColor,1.0f);
+//vec3 texColor = texture(SkyBoxTex, normalize(Vec)).rgb;
+//
+////Set skybox shader
+//FragColor = vec4 (texColor,1.0f);
 }
 
 }

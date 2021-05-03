@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include "helper/teapot.h"
 #include "helper/torus.h"
+#include "helper/plane.h"
 
 #include <imgui-1.79/imgui.h>
 #include <imgui-1.79/examples/imgui_impl_glfw.h>
@@ -29,16 +30,20 @@ private:
 
     glm::mat4 rotationMatrix;
 
-    GLSLProgram prog, edgeProg;
+    GLSLProgram prog, edgeProg, staffProg;
 
-    GLuint fsQuad, fboHandle, renderTex;
+    GLuint fboHandle;
+
+    GLuint fsQuad;
+    GLuint renderFBO, intermediateFBO;
+    GLuint renderTex, intermediateTex;
+
 
     float angle, tPrev, rotSpeed;
 
     SkyBox sky;
 
-    /*Torus torus;
-    Teapot teapot;*/
+    Plane plane;
 
 
     std::unique_ptr<ObjMesh> pyramid;
@@ -50,10 +55,15 @@ private:
     void renderGUI();
 
     void compile();
-    void setupFBO();
+    void setupEdgeFBO();
+    void setupGaussFBO();
 
     void pass1();
     void pass2();
+    void pass3();
+    float gauss(float, float);
+
+    void activateEdgeShader();
 
 public:
     SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow);

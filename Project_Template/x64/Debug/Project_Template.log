@@ -1,7 +1,8 @@
 ﻿E:\Hard Disk\Microsoft Visual Studio\2019\Enterprise\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1097,5): warning MSB8027: Two or more files with the name of imgui_impl_glfw.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are packages\imgui-1.79\examples\imgui_impl_glfw.cpp, packages\imgui-1.79\imgui_impl_glfw.cpp.
   scenebasic_uniform.cpp
-E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(330,23): warning C4305: '=': truncation from 'double' to 'float'
-E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(335,24): warning C4305: '=': truncation from 'double' to 'float'
-E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(353,17): warning C4101: 'display_h': unreferenced local variable
-E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(353,6): warning C4101: 'display_w': unreferenced local variable
+E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(65,39): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(425,23): warning C4305: '=': truncation from 'double' to 'float'
+E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(435,24): warning C4305: '=': truncation from 'double' to 'float'
+E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(455,17): warning C4101: 'display_h': unreferenced local variable
+E:\GitBackup\Shading-Developer-Tool\Project_Template\scenebasic_uniform.cpp(455,6): warning C4101: 'display_w': unreferenced local variable
   Project_Template.vcxproj -> E:\GitBackup\Shading-Developer-Tool\Project_Template\x64\Debug\Project_Template.exe

@@ -84,6 +84,9 @@
     <ClCompile Include="helper\teapot.cpp">
       <Filter>helper</Filter>
     </ClCompile>
+    <ClCompile Include="helper\plane.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.frag">
@@ -96,6 +99,12 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="shader\basic_uniform.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\staff_uniform.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\staff_uniform.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
@@ -155,6 +164,9 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="helper\teapot.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\plane.h">
       <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
