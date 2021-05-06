@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\2020-comp3016-cw2-Artizazel\packages\imgui-1.79\examples\imgui_impl_opengl3.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="helper\frustum.cpp" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
     <ClCompile Include="helper\objmesh.cpp" />
@@ -170,14 +171,19 @@
   <ItemGroup>
     <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.frag" />
     <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.vert" />
+    <None Include="shader\basicshadow_uniform.frag" />
+    <None Include="shader\basicshadow_uniform.vert" />
     <None Include="shader\basic_uniform.frag" />
     <None Include="shader\basic_uniform.vert" />
+    <None Include="shader\solid.frag" />
+    <None Include="shader\solid.vert" />
     <None Include="shader\staff_uniform.frag" />
     <None Include="shader\staff_uniform.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\aabb.h" />
     <ClInclude Include="helper\drawable.h" />
+    <ClInclude Include="helper\frustum.h" />
     <ClInclude Include="helper\glslprogram.h" />
     <ClInclude Include="helper\glutils.h" />
     <ClInclude Include="helper\objmesh.h" />
