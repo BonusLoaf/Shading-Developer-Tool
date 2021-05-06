@@ -13,7 +13,6 @@
 #include "helper/teapot.h"
 #include "helper/torus.h"
 #include "helper/plane.h"
-#include "helper/frustum.h"
 
 #include <imgui-1.79/imgui.h>
 #include <imgui-1.79/examples/imgui_impl_glfw.h>
@@ -31,10 +30,7 @@ private:
 
     glm::mat4 rotationMatrix;
 
-    GLSLProgram prog, edgeProg, staffProg, solidProg;
-    GLuint shadowFBO, pass1Index, pass2Index;
-
-    glm::mat4 lightPV, shadowBias;
+    GLSLProgram prog, edgeProg, staffProg;
 
     GLuint fboHandle;
 
@@ -42,17 +38,13 @@ private:
     GLuint renderFBO, intermediateFBO;
     GLuint renderTex, intermediateTex;
 
-    int shadowMapWidth, shadowMapHeight;
 
     float angle, tPrev, rotSpeed;
 
     SkyBox sky;
 
-    Teapot teapot;
     Plane plane;
-    Torus torus;
 
-    Frustum lightFrustum;
 
     std::unique_ptr<ObjMesh> pyramid;
 
@@ -61,8 +53,6 @@ private:
     void setMatrices();
 
     void renderGUI();
-
-    void drawScene();
 
     void compile();
     void setupEdgeFBO();
