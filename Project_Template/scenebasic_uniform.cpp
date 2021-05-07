@@ -32,12 +32,15 @@ using glm::vec4;
 using glm::mat4;
 using glm::mat3;
 
-int shaderType = 1;
+int imageProcessingType = 1;
 
 #include "helper/glutils.h"
 
-std::unique_ptr<ObjMesh> pyramid;
-std::unique_ptr<ObjMesh> staff;
+std::unique_ptr<ObjMesh> tree;
+std::unique_ptr<ObjMesh> sphinx;
+std::unique_ptr<ObjMesh> pond;
+std::unique_ptr<ObjMesh> cactus;
+std::unique_ptr<ObjMesh> camel;
 
 using glm::vec3;
 
@@ -47,11 +50,18 @@ float x, z;
 
 GLFWwindow* window;
 
-SceneBasic_Uniform::SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow) : angle(0.0f), tPrev(0.0f), rotSpeed(-0.3f), sky(100.0f), plane(50.0f,
-    50.0f, 1, 1)
+int structureType = 1;
+int floraType = 1;
+
+
+SceneBasic_Uniform::SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow) : angle(0.0f), tPrev(0.0f), rotSpeed(-0.0f), plane(500.0f,
+    500.0f, 1, 1), time(0), aniPlane(70.0f, 20.0f, 20, 2)
 {
-    pyramid = ObjMesh::load("media/pyr.obj", false, true);
-    staff = ObjMesh::load("media/staff.obj", true);
+    tree = ObjMesh::load("media/tree.obj", true);
+    sphinx = ObjMesh::load("media/sphinx.obj", true);
+    pond = ObjMesh::load("media/pond.obj", true);
+    cactus = ObjMesh::load("media/cactus.obj", true);
+    camel = ObjMesh::load("media/camel.obj", true);
 
     window = sceneRunnerWindow;
    
@@ -71,8 +81,6 @@ void SceneBasic_Uniform::initScene()
         glfwMakeContextCurrent(window);
 
         angle = glm::pi<float>() / 4.0f;
-
-        //view = glm::lookAt(vec3(0.5f, 0.75f, 0.75f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
         setupGaussFBO();
 
@@ -105,7 +113,7 @@ void SceneBasic_Uniform::initScene()
         glBindVertexArray(0);
 
 
-        prog.setUniform("Light.Position", (view * glm::vec4(x, 5.0f, 0.0, 0.0f)));
+        prog.setUniform("Light.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
         prog.setUniform("Light.L", vec3(1.0f));
         prog.setUniform("Light.La", vec3(0.6f));
 
@@ -125,8 +133,17 @@ void SceneBasic_Uniform::initScene()
             prog.setUniform(uniName.str().c_str(), val);
         }
 
-        
 
+        aniProg.use();
+        aniProg.setUniform("lights.Position", (view * glm::vec4(0.0f, 5.0f, 0.0, 0.0f)));
+
+        aniProg.setUniform("lights.L", vec3(0.627,0.843f,0.952f));
+
+        aniProg.setUniform("lights.La", vec3(0.6f));
+
+        angle = glm::half_pi<float>();
+        
+        prog.use();
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -138,56 +155,37 @@ void SceneBasic_Uniform::initScene()
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init();
 
-        //glClearColor(0.08f, 0.015f, 0.0f, 1.0f);
 
-        ////Add point light
-        
-
-        //prog.setUniform("Light.L", vec3(0.9f));
-
-        //prog.setUniform("Light.La", vec3(0.5f, 0.2f, 0.1f));
 
         //Locate all textures
-        GLuint skybox = Texture::loadCubeMap("media/skybox/sand", ".png");
 
-        GLuint pyBricks = Texture::loadTexture("media/texture/bricks.jpg");
+        GLuint treeTexture = Texture::loadTexture("media/texture/treeTex.png");
 
-        GLuint staff = Texture::loadTexture("media/texture/red.png");
+        GLuint sphinxTexture = Texture::loadTexture("media/texture/sphinxBricks.jpg");
 
-        //GLuint normalMap = Texture::loadTexture("media/texture/normalMap.png");
+        GLuint pondTexture = Texture::loadTexture("media/texture/pondTex.png");
 
-        GLuint dirt = Texture::loadTexture("media/texture/dirt.png");
+        GLuint sandTexture = Texture::loadTexture("media/texture/sand.png");
 
-        GLuint sand = Texture::loadTexture("media/texture/sand.png");
-
-        // Load brick texture file into channel 5
-       /* glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_2D, skybox);*/
 
         // Load texture file into channel 1
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, pyBricks);
+        glBindTexture(GL_TEXTURE_2D, treeTexture);
 
-        //staffProg.use();
 
         // Load texture file into channel 2
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, staff);
+        glBindTexture(GL_TEXTURE_2D, sphinxTexture);
 
         // Load texture file into channel 3
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, dirt);
+        glBindTexture(GL_TEXTURE_2D, pondTexture);
 
 
         // Load texture file into channel 4
         glActiveTexture(GL_TEXTURE4);
-        glBindTexture(GL_TEXTURE_2D, sand);
+        glBindTexture(GL_TEXTURE_2D, sandTexture);
 
-        // Load texture file into channel 3
-        //glActiveTexture(GL_TEXTURE3);
-        //glBindTexture(GL_TEXTURE_2D, normalMap);
-
-        //prog.use();
 
 }
 
@@ -203,7 +201,7 @@ void SceneBasic_Uniform::controls()
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
     {
 
-        shaderType = 1;
+        imageProcessingType = 1;
         prog.use();
 
 
@@ -252,7 +250,7 @@ void SceneBasic_Uniform::controls()
     }
     else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
     {
-        shaderType = 2;
+        imageProcessingType = 2;
 
 
         glEnable(GL_DEPTH_TEST);
@@ -303,7 +301,7 @@ void SceneBasic_Uniform::controls()
     }
     else if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
     {
-        shaderType = 0;
+        imageProcessingType = 0;
         glUseProgram(0);
     }
 
@@ -317,14 +315,13 @@ void SceneBasic_Uniform::compile()
 		prog.link();
 		prog.use();
 
-
         edgeProg.compileShader("shader/edge_uniform.vert");
         edgeProg.compileShader("shader/edge_uniform.frag");
         edgeProg.link();
-        
-        staffProg.compileShader("shader/staff_uniform.vert");
-        staffProg.compileShader("shader/staff_uniform.frag");
-        staffProg.link();
+
+        aniProg.compileShader("shader/animation_uniform.vert");
+        aniProg.compileShader("shader/animation_uniform.frag");
+        aniProg.link();
 
         
 	} catch (GLSLProgramException &e) {
@@ -336,7 +333,7 @@ void SceneBasic_Uniform::compile()
 void SceneBasic_Uniform::update( float t )
 {
         
-
+    time = t;
     
         float deltaT = t - tPrev;
         if (tPrev == 0.0f)
@@ -354,7 +351,7 @@ void SceneBasic_Uniform::update( float t )
 
 void SceneBasic_Uniform::activateEdgeShader()
 {
-    shaderType = 2;
+    imageProcessingType = 0;
 
 
     glEnable(GL_DEPTH_TEST);
@@ -420,6 +417,11 @@ void SceneBasic_Uniform::renderGUI()
 
 	ImGui::Text("---------Camera---------");
 
+    if (ImGui::Button("<<"))
+    {
+        rotSpeed = 0.6;
+    }
+    ImGui::SameLine();
     if (ImGui::Button("<"))
     {
         rotSpeed = 0.3;
@@ -434,8 +436,40 @@ void SceneBasic_Uniform::renderGUI()
     {
         rotSpeed = -0.3;
     }
+    ImGui::SameLine();
+    if (ImGui::Button(">>"))
+    {
+        rotSpeed = -0.6;
+    }
     
-    ImGui::Text("---------Shaders---------");
+    ImGui::Text("---------Flora---------");
+
+    if (ImGui::Button("Tree"))
+    {
+        floraType = 1;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Cactus"))
+    {
+        floraType = 2;
+    }
+
+
+    ImGui::Text("---------Structures---------");
+
+    if (ImGui::Button("Sphinx"))
+    {
+        structureType = 1;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Camel"))
+    {
+        structureType = 2;
+    }
+
+
+
+    ImGui::Text("---------Image Processing---------");
 
     if (ImGui::Button("Edge Shader"))
     {
@@ -444,11 +478,6 @@ void SceneBasic_Uniform::renderGUI()
 
 
 	ImGui::End();
-
-
-	
-
-
 
 
 	ImGui::Render();
@@ -466,52 +495,42 @@ void SceneBasic_Uniform::render()
     pass1();
     pass2();
 
-    if (shaderType == 1)
+    if (imageProcessingType == 1)
     {
-        prog.use();
         pass3();
     }
     else
     {
-        edgeProg.use();
         glFlush();
     }
 
-    //staffProg.use();
+    
+
+    view = glm::lookAt(vec3(10.0f * cos(angle), 4.0f, 10.0f * sin(angle)), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+
+    projection = glm::perspective(glm::radians(60.0f), (float)width / height, 0.3f, 100.0f);
+
+
 
     controls();
-        //prog.use();
-        renderGUI();
-        glfwPollEvents();
-    
-       
-
-    
-
+    renderGUI();
+    glfwPollEvents();
 
 }
 
-void SceneBasic_Uniform::setMatrices()
+void SceneBasic_Uniform::setMatrices(GLSLProgram& program)
 {
-    if (shaderType == 1)
-    {
+    
+    
         mat4 mv;
         mv = view * model;
 
-        prog.setUniform("ModelViewMatrix", mv);
-        prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
-        prog.setUniform("MVP", projection * mv);
-    }
-    else
-    {
-
-        mat4 mv = view * model;
-        edgeProg.setUniform("ModelMatrix", model);
-        edgeProg.setUniform("ModelViewMatrix", mv);
-        edgeProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]),
-            vec3(mv[2])));
-        edgeProg.setUniform("MVP", projection * mv);
-    }
+        program.setUniform("ModelMatrix", model);
+        program.setUniform("ModelViewMatrix", mv);
+        program.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+        program.setUniform("MVP", projection * mv);
+    
+    
 
 }
 
@@ -608,7 +627,7 @@ void SceneBasic_Uniform::setupGaussFBO()
 
 void SceneBasic_Uniform::pass1()
 {
-    if (shaderType == 1)
+    if (imageProcessingType == 1)
     {
         prog.use();
 
@@ -617,66 +636,120 @@ void SceneBasic_Uniform::pass1()
         glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        view = glm::lookAt(vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle)),
-            vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-        projection = glm::perspective(glm::radians(60.0f), (float)width / height,
-            0.3f, 100.0f);
+        
 
 
         //Sets parameters for model and renders them
         prog.setUniform("texID", 1);
-        //prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
         prog.setUniform("Material.Kd", 0.8f, 0.8f, 0.8f);
         prog.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
         prog.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
         prog.setUniform("Material.Shininess", 5.0f);
         model = mat4(1.0f);
-        model = glm::translate(model, vec3(0.0f, -1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
-        setMatrices();
-        pyramid->render();
+        
+        if (floraType == 1)
+        {
+            model = glm::translate(model, vec3(-3.0f, -1.0f, -6.0f));
+            model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(1.0f));
+            setMatrices(prog);
+            tree->render();
+        }
+        else
+        {
+            model = glm::translate(model, vec3(-3.0f, 1.5f, -6.0f));
+            model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(0.02f));
+            setMatrices(prog);
+            cactus->render();
+        }
 
-
-        //staffProg.use();
 
         
-
-        //Sets parameters for model and renders them
-        //Also Changes texID to choose a different texture
         prog.setUniform("texID", 2);
-       // prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
         prog.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
         prog.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
         prog.setUniform("Material.Ka", 0.5f, 0.5f, 0.5f);
         prog.setUniform("Material.Shininess", 180.0f);
         model = mat4(1.0f);
-        model = glm::translate(model, vec3(4.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(25.0f, 12.0f, 25.0f));
-        setMatrices();
-        staff->render();
+        
+
+        if (structureType == 1)
+        {
+            model = glm::translate(model, vec3(9.0f, 1.0f, -8.0f));
+            model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(-30.0f), vec3(0.0f, 0.0f, 1.0f));
+            model = glm::scale(model, glm::vec3(0.002f));
+            setMatrices(prog);
+            sphinx->render();
+        }
+        else
+        {
+            model = glm::translate(model, vec3(7.5f, 0.8f, -6.0f));
+            model = glm::rotate(model, glm::radians(-30.0f), vec3(0.0f, 1.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(0.3f));
+            setMatrices(prog);
+            camel->render();
+        }
+        
+
+
+
+
 
         prog.setUniform("texID", 3);
-        //prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
         prog.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
         prog.setUniform("Material.Ks", 0.0f, 0.0f, 0.0f);
         prog.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
         prog.setUniform("Material.Shininess", 1.0f);
         model = mat4(1.0f);
         model = glm::translate(model, vec3(0.0f, -0.75f, 0.0f));
-        setMatrices();
+        setMatrices(prog);
         plane.render();
 
-        /*vec3 cameraPos = vec3(7.0f * cos(angle), 2.0f, 7.0f * sin(angle));
-        view = glm::lookAt(cameraPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f,
-            0.0f));*/
 
-        //Sets parameters for skybox and renders it
-        /*prog.setUniform("texID", 0);
+        prog.setUniform("lights.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
+
+        prog.setUniform("lights.L", vec3(0.627, 0.843f, 0.952f));
+
+        prog.setUniform("lights.La", vec3(0.6f));
+
+        prog.setUniform("texID", 4);
+        prog.setUniform("Material.Kd", 0.2f, 0.5f, 0.9f);
+        prog.setUniform("Material.Ks", 0.2f, 0.5f, 0.9f);
+        prog.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
+        prog.setUniform("Material.Shininess", 180.0f);
         model = mat4(1.0f);
-        setMatrices();
-        sky.render();*/
+        model = glm::translate(model, vec3(0.0f, -0.8f, -6.0f));
+        setMatrices(prog);
+        pond->render();
+        
+
+        prog.setUniform("Light.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
+        prog.setUniform("Light.L", vec3(1.0f));
+        prog.setUniform("Light.La", vec3(0.6f));
+
+
+
+
+
+        aniProg.use();
+        aniProg.setUniform("Time", time);
+
+
+        aniProg.setUniform("Material.Kd", 0.2f, 0.5f, 0.9f);
+        aniProg.setUniform("Material.Ks", 0.2f, 0.5f, 0.9f);
+        aniProg.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
+        aniProg.setUniform("Material.Shininess", 1.0f);
+        model = mat4(1.0f);
+        
+        model = mat4(1.0f);
+        model = glm::translate(model, vec3(0.0f, -0.7f, -6.0f));
+        model = glm::scale(model, glm::vec3(0.999f, 0.03f, 0.999f));
+        setMatrices(aniProg);
+        pond->render();
+
+
     }
     else
     {
@@ -686,70 +759,124 @@ void SceneBasic_Uniform::pass1()
         glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        vec3 cameraPos = vec3(7.0f * cos(angle), 2.0f, 7.0f * sin(angle));
-        view = glm::lookAt(cameraPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f,
-            0.0f));
-        projection = glm::perspective(glm::radians(60.0f), (float)width / height,
-            0.3f, 100.0f);
+
+
+        
+        edgeProg.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
 
         //Sets parameters for model and renders them
-        prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        edgeProg.setUniform("texID", 1);
         edgeProg.setUniform("Material.Kd", 0.8f, 0.8f, 0.8f);
         edgeProg.setUniform("Material.Ks", 0.2f, 0.2f, 0.2f);
         edgeProg.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
         edgeProg.setUniform("Material.Shininess", 5.0f);
         model = mat4(1.0f);
-        model = glm::translate(model, vec3(0.0f, -1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.3f, 0.3f, 0.3f));
-        setMatrices();
-        pyramid->render();
+
+        if (floraType == 1)
+        {
+            model = glm::translate(model, vec3(-3.0f, -1.0f, -6.0f));
+            model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(1.0f));
+            setMatrices(edgeProg);
+            tree->render();
+        }
+        else
+        {
+            model = glm::translate(model, vec3(-3.0f, 1.5f, -6.0f));
+            model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(0.02f));
+            setMatrices(edgeProg);
+            cactus->render();
+        }
 
 
-        //Sets parameters for model and renders them
-        //Also Changes texID to choose a different texture
-        prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
         edgeProg.setUniform("texID", 2);
         edgeProg.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
         edgeProg.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
         edgeProg.setUniform("Material.Ka", 0.5f, 0.5f, 0.5f);
         edgeProg.setUniform("Material.Shininess", 180.0f);
         model = mat4(1.0f);
-        model = glm::translate(model, vec3(4.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(25.0f, 12.0f, 25.0f));
-        setMatrices();
-        staff->render();
 
 
-        /*edgeProg.setUniform("Pass", 1);
-        glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
-        glEnable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        view = glm::lookAt(vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle)),
-            vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-        projection = glm::perspective(glm::radians(60.0f), (float)width / height,
-            0.3f, 100.0f);
-        edgeProg.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
-        edgeProg.setUniform("Material.Kd", 0.9f, 0.9f, 0.9f);
-        edgeProg.setUniform("Material.Ks", 0.95f, 0.95f, 0.95f);
+        if (structureType == 1)
+        {
+            model = glm::translate(model, vec3(9.0f, 1.0f, -8.0f));
+            model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(-30.0f), vec3(0.0f, 0.0f, 1.0f));
+            model = glm::scale(model, glm::vec3(0.002f));
+            setMatrices(edgeProg);
+            sphinx->render();
+        }
+        else
+        {
+            model = glm::translate(model, vec3(7.5f, 0.8f, -6.0f));
+            model = glm::rotate(model, glm::radians(-30.0f), vec3(0.0f, 1.0f, 0.0f));
+            model = glm::scale(model, glm::vec3(0.3f));
+            setMatrices(edgeProg);
+            camel->render();
+        }
+
+
+
+
+
+
+        edgeProg.setUniform("texID", 3);
+        edgeProg.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
+        edgeProg.setUniform("Material.Ks", 0.0f, 0.0f, 0.0f);
         edgeProg.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
-        edgeProg.setUniform("Material.Shininess", 100.0f);
+        edgeProg.setUniform("Material.Shininess", 1.0f);
         model = mat4(1.0f);
-        model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
-        setMatrices();
-        teapot.render();
-        edgeProg.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
-        edgeProg.setUniform("Material.Kd", 0.9f, 0.5f, 0.2f);
-        edgeProg.setUniform("Material.Ks", 0.95f, 0.95f, 0.95f);
-        edgeProg.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
-        edgeProg.setUniform("Material.Shininess", 100.0f);
+        model = glm::translate(model, vec3(0.0f, -0.75f, 0.0f));
+        setMatrices(edgeProg);
+        plane.render();
+
+
+        edgeProg.setUniform("lights.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
+
+        edgeProg.setUniform("lights.L", vec3(0.627, 0.843f, 0.952f));
+
+        edgeProg.setUniform("lights.La", vec3(0.6f));
+
+        edgeProg.setUniform("texID", 4);
+        edgeProg.setUniform("Material.Kd", 0.2f, 0.5f, 0.9f);
+        edgeProg.setUniform("Material.Ks", 0.2f, 0.5f, 0.9f);
+        edgeProg.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
+        edgeProg.setUniform("Material.Shininess", 180.0f);
         model = mat4(1.0f);
-        model = glm::translate(model, vec3(1.0f, 1.0f, 3.0f));
-        model = glm::rotate(model, glm::radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
-        setMatrices();
-        torus.render();*/
+        model = glm::translate(model, vec3(0.0f, -0.8f, -6.0f));
+        setMatrices(edgeProg);
+        pond->render();
+
+
+        edgeProg.setUniform("Light.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
+        edgeProg.setUniform("Light.L", vec3(1.0f));
+        edgeProg.setUniform("Light.La", vec3(0.6f));
+
+
+
+
+
+        aniProg.use();
+        aniProg.setUniform("Time", time);
+
+
+        aniProg.setUniform("Material.Kd", 0.2f, 0.5f, 0.9f);
+        aniProg.setUniform("Material.Ks", 0.2f, 0.5f, 0.9f);
+        aniProg.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
+        aniProg.setUniform("Material.Shininess", 1.0f);
+        model = mat4(1.0f);
+
+        model = mat4(1.0f);
+        model = glm::translate(model, vec3(0.0f, -0.7f, -6.0f));
+        model = glm::scale(model, glm::vec3(0.999f, 0.03f, 0.999f));
+        setMatrices(aniProg);
+        pond->render();
+
+
+        edgeProg.use();
 
 
     }
@@ -761,7 +888,7 @@ void SceneBasic_Uniform::pass1()
 void SceneBasic_Uniform::pass2()
 {
 
-    if (shaderType == 1)
+    if (imageProcessingType == 1)
     {
         prog.use();
         prog.setUniform("Pass", 2);
@@ -773,7 +900,7 @@ void SceneBasic_Uniform::pass2()
         model = mat4(1.0f);
         view = mat4(1.0f);
         projection = mat4(1.0f);
-        setMatrices();
+        setMatrices(prog);
         // Render the full-screen quad
         glBindVertexArray(fsQuad);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -791,7 +918,7 @@ void SceneBasic_Uniform::pass2()
         model = mat4(1.0f);
         view = mat4(1.0f);
         projection = mat4(1.0f);
-        setMatrices();
+        setMatrices(edgeProg);
         // Render the full-screen quad
         glBindVertexArray(fsQuad);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -809,7 +936,7 @@ void SceneBasic_Uniform::pass3()
     model = mat4(1.0f);
     view = mat4(1.0f);
     projection = mat4(1.0f);
-    setMatrices();
+    setMatrices(prog);
     // Render the full-screen quad
     glBindVertexArray(fsQuad);
     glDrawArrays(GL_TRIANGLES, 0, 6);

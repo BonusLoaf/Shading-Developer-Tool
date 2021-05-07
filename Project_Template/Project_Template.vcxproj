@@ -170,6 +170,8 @@
   <ItemGroup>
     <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.frag" />
     <None Include="C:\Users\samue\Downloads\Shading-9902b6824d6ce541cc51d895ee948fbf67cb97e0\Project_Template\shader\edge_uniform.vert" />
+    <None Include="shader\animation_uniform.frag" />
+    <None Include="shader\animation_uniform.vert" />
     <None Include="shader\basic_uniform.frag" />
     <None Include="shader\basic_uniform.vert" />
     <None Include="shader\staff_uniform.frag" />

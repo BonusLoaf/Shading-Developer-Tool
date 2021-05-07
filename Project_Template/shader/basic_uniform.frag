@@ -24,10 +24,10 @@ vec3 Ks;
 float Shininess;
 }Material;
 
-//layout(binding=5) uniform samplerCube SkyBoxTex;
-layout(binding=1) uniform sampler2D PyTex;
-layout(binding=2) uniform sampler2D StaffTex;
-layout(binding=3) uniform sampler2D DirtTex;
+
+layout(binding=1) uniform sampler2D TreeTex;
+layout(binding=2) uniform sampler2D SphinxTex;
+layout(binding=3) uniform sampler2D PondTex;
 layout(binding=4) uniform sampler2D SandTex;
 layout( binding=0 ) uniform sampler2D Texture0;
 
@@ -35,9 +35,9 @@ layout (location = 0) out vec4 FragColor;
 
 in vec2 TexCoord;
 
-vec3 TexColor = texture(PyTex, TexCoord).rgb;
-vec4 TexPyramid = texture(PyTex, TexCoord);
-vec4 TexOverlay = texture(DirtTex, TexCoord);
+vec3 TexColor = texture(TreeTex, TexCoord).rgb;
+vec4 TexPyramid = texture(TreeTex, TexCoord);
+
 
 uniform float Weight[5];
 uniform float EdgeThreshold;
@@ -53,15 +53,19 @@ vec3 blinnPhongModel(vec3 position, vec3 normal)
 
 if(texID == 1)
 {
-TexColor = texture(PyTex, TexCoord).rgb;
+TexColor = texture(TreeTex, TexCoord).rgb;
 }
 else if(texID == 2)
 {
-TexColor = texture(StaffTex, TexCoord).rgb;
+TexColor = texture(SphinxTex, TexCoord).rgb;
 }
 else if(texID == 3)
 {
 TexColor = texture(SandTex, TexCoord).rgb;
+}
+else if(texID == 4)
+{
+TexColor = texture(PondTex, TexCoord).rgb;
 }
 
 
@@ -156,9 +160,6 @@ vec4 pass3()
 void main() {
 
 
-if(texID > 0)
-{
-
 
 if( Pass == 1 )
 {
@@ -173,17 +174,5 @@ FragColor = pass2();
 FragColor = pass3();
 }
 
-
-
-
-
-}
-else
-{
-//vec3 texColor = texture(SkyBoxTex, normalize(Vec)).rgb;
-//
-////Set skybox shader
-//FragColor = vec4 (texColor,1.0f);
-}
 
 }

@@ -107,6 +107,12 @@
     <None Include="shader\staff_uniform.vert">
       <Filter>shaders</Filter>
     </None>
+    <None Include="shader\animation_uniform.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\animation_uniform.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\scene.h">

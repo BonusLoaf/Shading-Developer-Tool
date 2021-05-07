@@ -30,27 +30,15 @@ private:
 
     glm::mat4 rotationMatrix;
 
-    GLSLProgram prog, edgeProg, staffProg;
+    GLSLProgram prog, edgeProg, aniProg;
 
-    GLuint fboHandle;
+    GLuint fboHandle, fsQuad, renderFBO, intermediateFBO, renderTex, intermediateTex;
 
-    GLuint fsQuad;
-    GLuint renderFBO, intermediateFBO;
-    GLuint renderTex, intermediateTex;
+    float angle, tPrev, rotSpeed, time;
 
+    Plane plane, aniPlane;
 
-    float angle, tPrev, rotSpeed;
-
-    SkyBox sky;
-
-    Plane plane;
-
-
-    std::unique_ptr<ObjMesh> pyramid;
-
-    std::unique_ptr<ObjMesh> staff;
-
-    void setMatrices();
+    void setMatrices(GLSLProgram& program);
 
     void renderGUI();
 
