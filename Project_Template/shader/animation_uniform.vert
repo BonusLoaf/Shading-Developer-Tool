@@ -10,35 +10,37 @@ out vec2 TexCoord;
 
 uniform float Time;
 
-uniform float Freq = 2.5;
-uniform float Velocity = 2.5;
-uniform float Amp = 0.6;
+uniform float Freq = 2.0;
+uniform float Velocity = 2.0;
+uniform float Amp = 0.8;
 
 uniform mat4 ModelViewMatrix;
 uniform mat3 NormalMatrix;
 uniform mat4 MVP;
 
 
+//Sets all parameters necessary for frag uniform
 void main() { 
 
-vec4 pos = vec4(VertexPosition, 1.0);
+vec4 pos4 = vec4(VertexPosition, 1.0);
 
-//translate verteces on y coordinates
-float u = Freq * pos.x - Velocity * Time;
-pos.y = Amp * sin(u);
+//transforms vertices on y coordinates using 'time' variable
+float u = Freq * pos4.x - Velocity * Time;
 
-//compute the normal vector
+pos4.y = Amp * sin(u);
+
+//calc normal vector
 vec3 n = vec3(0.0);
+
 n.xy = normalize(vec2(cos(u), 1.0));
 
-//pass values to the fragment shader
-Position = ModelViewMatrix * pos;
+
+Position = ModelViewMatrix * pos4;
+
 Normal = NormalMatrix * n;
 TexCoord = VertexTexCoord;
 
-
-//the position on clip coordinates
-gl_Position = MVP * pos;
+gl_Position = MVP * pos4;
 
 
 }

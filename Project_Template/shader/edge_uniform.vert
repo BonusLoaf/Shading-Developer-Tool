@@ -12,6 +12,7 @@ uniform mat4 MVP;
 out vec3 Position;
 out vec3 Normal;
 
+//Sets all parameters necessary for frag uniform
 void main() { 
  
  vec4 pos4 = vec4(VertexPosition, 1.0);

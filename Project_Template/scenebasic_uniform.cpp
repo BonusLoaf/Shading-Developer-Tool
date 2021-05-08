@@ -54,8 +54,9 @@ int structureType = 1;
 int floraType = 1;
 
 
+//Prepares all parameters and models 
 SceneBasic_Uniform::SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow) : angle(0.0f), tPrev(0.0f), rotSpeed(-0.0f), plane(500.0f,
-    500.0f, 1, 1), time(0), aniPlane(70.0f, 20.0f, 20, 2)
+    500.0f, 1, 1), time(0)
 {
     tree = ObjMesh::load("media/tree.obj", true);
     sphinx = ObjMesh::load("media/sphinx.obj", true);
@@ -68,6 +69,7 @@ SceneBasic_Uniform::SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow) : angle(0.
 }
 
 
+//Prepares parameters for scene (lights, GUI, frame buffers etc.)
 void SceneBasic_Uniform::initScene()
 {
 
@@ -84,48 +86,38 @@ void SceneBasic_Uniform::initScene()
 
         setupGaussFBO();
 
-        // Array for full-screen quad
-        GLfloat verts[] = {
-    -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-    -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f
-        };
-        GLfloat tc[] = {
-        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
-        };
+        GLfloat verts[] = { -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f };
+        GLfloat tc[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f };
 
-        // Set up the buffers
         unsigned int handle[2];
         glGenBuffers(2, handle);
         glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
         glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
         glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
-        // Set up the vertex array object
         glGenVertexArrays(1, &fsQuad);
         glBindVertexArray(fsQuad);
         glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
         glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(0); // Vertex position
+        glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
         glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(2); // Texture coordinates
+        glEnableVertexAttribArray(2);
         glBindVertexArray(0);
 
-
+        //Sets light parameters for gauss shader
         prog.setUniform("Light.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
         prog.setUniform("Light.L", vec3(1.0f));
         prog.setUniform("Light.La", vec3(0.6f));
 
+
         float weights[5], sum, sigma2 = 8.0f;
-        // Compute and sum the weights
         weights[0] = gauss(0, sigma2);
         sum = weights[0];
         for (int i = 1; i < 5; i++) {
             weights[i] = gauss(float(i), sigma2);
             sum += 2 * weights[i];
         }
-        // Normalize the weights and set the uniform
         for (int i = 0; i < 5; i++) {
             std::stringstream uniName;
             uniName << "Weight[" << i << "]";
@@ -145,6 +137,8 @@ void SceneBasic_Uniform::initScene()
         
         prog.use();
 
+
+        //sets up GUI
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -189,6 +183,7 @@ void SceneBasic_Uniform::initScene()
 
 }
 
+//Gaussian Distrobution
 float SceneBasic_Uniform::gauss(float x, float sigma2)
 {
     double coeff = 1.0 / (glm::two_pi<double>() * sigma2);
@@ -196,122 +191,12 @@ float SceneBasic_Uniform::gauss(float x, float sigma2)
     return (float)(coeff * exp(expon));
 }
 
-void SceneBasic_Uniform::controls()
-{
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    {
-
-        imageProcessingType = 1;
-        prog.use();
-
-
-        //angle = glm::radians(90.0f);
-
-
-
-        view = glm::lookAt(vec3(0.5f, 0.75f, 0.75f), vec3(5.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-        //projection = mat4(1.0f);
-
-        //
-
-        ////Locate all textures
-        //GLuint skybox = Texture::loadCubeMap("media/skybox/sand", ".png");
-
-        //GLuint pyBricks = Texture::loadTexture("media/texture/bricks.jpg");
-
-        //GLuint staff = Texture::loadTexture("media/texture/red.png");
-
-        //GLuint normalMap = Texture::loadTexture("media/texture/normalMap.png");
-
-        //GLuint dirt = Texture::loadTexture("media/texture/dirt.png");
-
-        //// Load brick texture file into channel 0
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, skybox);
-
-        //// Load texture file into channel 1
-        //glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_2D, pyBricks);
-
-
-        //// Load texture file into channel 2
-        //glActiveTexture(GL_TEXTURE2);
-        //glBindTexture(GL_TEXTURE_2D, staff);
-
-        //// Load texture file into channel 3
-        //glActiveTexture(GL_TEXTURE3);
-        //glBindTexture(GL_TEXTURE_2D, normalMap);
-
-        //// Load texture file into channel 4
-        //glActiveTexture(GL_TEXTURE4);
-        //glBindTexture(GL_TEXTURE_2D, dirt);
-
-
-    }
-    else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-    {
-        imageProcessingType = 2;
-
-
-        glEnable(GL_DEPTH_TEST);
-        projection = mat4(1.0f);
-        angle = glm::pi<float>() / 4.0f;
-        setupEdgeFBO();
-        // Array for full-screen quad
-        GLfloat verts[] = {
-        -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f
-        };
-        GLfloat tc[] = {
-        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-        0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
-        };
-        // Set up the buffers
-        unsigned int handle[2];
-        glGenBuffers(2, handle);
-        glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-        glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-        glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
-        // Set up the vertex array object
-        glGenVertexArrays(1, &fsQuad);
-        glBindVertexArray(fsQuad);
-        glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-        glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(0); // Vertex position
-        glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-        glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(2); // Texture coordinates
-        glBindVertexArray(0);
-        edgeProg.setUniform("EdgeThreshold", 0.05f);
-        edgeProg.setUniform("Light.L", vec3(1.0f));
-        edgeProg.setUniform("Light.La", vec3(0.2f));
-
-
-        edgeProg.use();
-
-        //Add point light
-        edgeProg.setUniform("Light.Position", (view * glm::vec4(x, 5.0f, 0.0, 0.0f)));
-
-        edgeProg.setUniform("Light.L", vec3(0.2f));
-
-        edgeProg.setUniform("Light.La", vec3(0.9f, 0.2f, 0.1f));
-
-
-    }
-    else if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
-    {
-        imageProcessingType = 0;
-        glUseProgram(0);
-    }
-
-}
-
+//Retrives all shader files and sets them to their respective GLSLPrograms
 void SceneBasic_Uniform::compile()
 {
 	try {
-		prog.compileShader("shader/basic_uniform.vert");
-		prog.compileShader("shader/basic_uniform.frag");
+		prog.compileShader("shader/gauss_uniform.vert");
+		prog.compileShader("shader/gauss_uniform.frag");
 		prog.link();
 		prog.use();
 
@@ -330,6 +215,7 @@ void SceneBasic_Uniform::compile()
 	}
 }
 
+//Rotates the camera and updates the 'time' variable, to use in the animation shader
 void SceneBasic_Uniform::update( float t )
 {
         
@@ -348,7 +234,81 @@ void SceneBasic_Uniform::update( float t )
 
 }
 
+//Swaps to gauss shader and sets up the gauss frame buffers
+void SceneBasic_Uniform::activateGaussShader()
+{
+    imageProcessingType = 1;
 
+
+    glEnable(GL_DEPTH_TEST);
+   
+
+    angle = glm::pi<float>() / 4.0f;
+
+    setupGaussFBO();
+
+    GLfloat verts[] = {-1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f };
+    GLfloat tc[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+
+    
+    unsigned int handle[2];
+    glGenBuffers(2, handle);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
+   
+    glGenVertexArrays(1, &fsQuad);
+    glBindVertexArray(fsQuad);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0); 
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(2);
+    glBindVertexArray(0);
+
+
+    prog.setUniform("Light.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
+    prog.setUniform("Light.L", vec3(1.0f));
+    prog.setUniform("Light.La", vec3(0.6f));
+
+
+
+
+    float weights[5], sum, sigma2 = 8.0f;
+    weights[0] = gauss(0, sigma2);
+    sum = weights[0];
+    for (int i = 1; i < 5; i++) {
+        weights[i] = gauss(float(i), sigma2);
+        sum += 2 * weights[i];
+    }
+    for (int i = 0; i < 5; i++) {
+        std::stringstream uniName;
+        uniName << "Weight[" << i << "]";
+        float val = weights[i] / sum;
+        prog.setUniform(uniName.str().c_str(), val);
+    }
+
+
+    aniProg.use();
+    aniProg.setUniform("lights.Position", (view * glm::vec4(0.0f, 5.0f, 0.0, 0.0f)));
+
+    aniProg.setUniform("lights.L", vec3(0.627, 0.843f, 0.952f));
+
+    aniProg.setUniform("lights.La", vec3(0.6f));
+
+    angle = glm::half_pi<float>();
+
+    prog.use();
+   
+    
+
+
+
+}
+
+//Swaps to edge shader and sets up the edge frame buffer
 void SceneBasic_Uniform::activateEdgeShader()
 {
     imageProcessingType = 0;
@@ -358,40 +318,34 @@ void SceneBasic_Uniform::activateEdgeShader()
     projection = mat4(1.0f);
     angle = glm::pi<float>() / 4.0f;
     setupEdgeFBO();
-    // Array for full-screen quad
     GLfloat verts[] = {
-    -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-    -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f
-    };
-    GLfloat tc[] = {
-    0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-    0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
-    };
-    // Set up the buffers
+    -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f };
+    GLfloat tc[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f };
+    
     unsigned int handle[2];
     glGenBuffers(2, handle);
     glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
     glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
     glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
-    // Set up the vertex array object
+    
     glGenVertexArrays(1, &fsQuad);
     glBindVertexArray(fsQuad);
     glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
     glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0); // Vertex position
+    glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
     glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(2); // Texture coordinates
+    glEnableVertexAttribArray(2); 
     glBindVertexArray(0);
-    edgeProg.setUniform("EdgeThreshold", 0.05f);
+    edgeProg.setUniform("EdgeThreshold", 0.01f);
     edgeProg.setUniform("Light.L", vec3(1.0f));
     edgeProg.setUniform("Light.La", vec3(0.2f));
 
 
     edgeProg.use();
 
-    //Add point light
+    
     edgeProg.setUniform("Light.Position", (view * glm::vec4(x, 5.0f, 0.0, 0.0f)));
 
     edgeProg.setUniform("Light.L", vec3(0.2f));
@@ -399,6 +353,7 @@ void SceneBasic_Uniform::activateEdgeShader()
     edgeProg.setUniform("Light.La", vec3(0.9f, 0.2f, 0.1f));
 }
 
+//Sets up the gui and its buttons
 void SceneBasic_Uniform::renderGUI()
 {
 
@@ -471,9 +426,16 @@ void SceneBasic_Uniform::renderGUI()
 
     ImGui::Text("---------Image Processing---------");
 
-    if (ImGui::Button("Edge Shader"))
+    if (ImGui::Button("Edge Filter"))
     {
         activateEdgeShader();
+        activateEdgeShader();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Blur Filter"))
+    {
+        activateGaussShader();
+        activateGaussShader();
     }
 
 
@@ -486,6 +448,7 @@ void SceneBasic_Uniform::renderGUI()
 
 }
 
+//Calls all 3 passes to render the models and apply lighting, textures and filters(2 if edge shader is active)
 void SceneBasic_Uniform::render()
 {
     
@@ -499,12 +462,8 @@ void SceneBasic_Uniform::render()
     {
         pass3();
     }
-    else
-    {
-        glFlush();
-    }
-
     
+
 
     view = glm::lookAt(vec3(10.0f * cos(angle), 4.0f, 10.0f * sin(angle)), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
 
@@ -512,12 +471,12 @@ void SceneBasic_Uniform::render()
 
 
 
-    controls();
     renderGUI();
     glfwPollEvents();
 
 }
 
+//Parses the 'program' varibale for use with multiple shaders
 void SceneBasic_Uniform::setMatrices(GLSLProgram& program)
 {
     
@@ -543,88 +502,92 @@ void SceneBasic_Uniform::resize(int w, int h)
         0.3f, 100.0f);
 }
 
-
+//Sets up edge filter frame buffer
 void SceneBasic_Uniform::setupEdgeFBO()
 {
-    // Generate and bind the framebuffer
+
+    GLuint depthBuffer;
+    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+    
     glGenFramebuffers(1, &fboHandle);
     glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
-    // Create the texture object
+    
+
     glGenTextures(1, &renderTex);
     glBindTexture(GL_TEXTURE_2D, renderTex);
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-    // Bind the texture to the FBO
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
         renderTex, 0);
-    // Create the depth buffer
-    GLuint depthBuf;
-    glGenRenderbuffers(1, &depthBuf);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
+    
+
+    
+    glGenRenderbuffers(1, &depthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-    // Bind the depth buffer to the FBO
+    
+
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-        GL_RENDERBUFFER, depthBuf);
-    // Set the targets for the fragment output variables
-    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+        GL_RENDERBUFFER, depthBuffer);
+    
+
     glDrawBuffers(1, drawBuffers);
-    // Unbind the framebuffer, and revert to default framebuffer
+    
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-
+//Sets up guassian blur filter frame buffers
 void SceneBasic_Uniform::setupGaussFBO()
 {
-    // Generate and bind the framebuffer
+
+    GLuint depthBuffer;
+    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+
     glGenFramebuffers(1, &renderFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
-    // Create the texture object
+
     glGenTextures(1, &renderTex);
     glBindTexture(GL_TEXTURE_2D, renderTex);
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-    // Bind the texture to the FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-        renderTex, 0);
-    // Create the depth buffer
-    GLuint depthBuf;
-    glGenRenderbuffers(1, &depthBuf);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+
+    glGenRenderbuffers(1, &depthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-    // Bind the depth buffer to the FBO
+
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-        GL_RENDERBUFFER, depthBuf);
-    // Set the targets for the fragment output variables
-    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+        GL_RENDERBUFFER, depthBuffer);
+
     glDrawBuffers(1, drawBuffers);
-    // Unbind the framebuffer, and revert to default framebuffer
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // Generate and bind the framebuffer
+
     glGenFramebuffers(1, &intermediateFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-    // Create the texture object
     glGenTextures(1, &intermediateTex);
-    glActiveTexture(GL_TEXTURE0); // Use texture unit 0
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, intermediateTex);
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-    // Bind the texture to the FBO
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
         intermediateTex, 0);
-    // No depth buffer needed for this FBO
-    // Set the targets for the fragment output variables
+
     glDrawBuffers(1, drawBuffers);
-    // Unbind the framebuffer, and revert to default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-
+//Renders scene to a texture, sets parameters for the shader currently in use (gauss or edge)
 void SceneBasic_Uniform::pass1()
 {
     if (imageProcessingType == 1)
@@ -638,7 +601,6 @@ void SceneBasic_Uniform::pass1()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
 
-
         //Sets parameters for model and renders them
         prog.setUniform("texID", 1);
         prog.setUniform("Material.Kd", 0.8f, 0.8f, 0.8f);
@@ -647,6 +609,7 @@ void SceneBasic_Uniform::pass1()
         prog.setUniform("Material.Shininess", 5.0f);
         model = mat4(1.0f);
         
+        //Renders different model depending on GUI selection
         if (floraType == 1)
         {
             model = glm::translate(model, vec3(-3.0f, -1.0f, -6.0f));
@@ -708,31 +671,12 @@ void SceneBasic_Uniform::pass1()
         plane.render();
 
 
-        prog.setUniform("lights.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
-
-        prog.setUniform("lights.L", vec3(0.627, 0.843f, 0.952f));
-
-        prog.setUniform("lights.La", vec3(0.6f));
-
-        prog.setUniform("texID", 4);
-        prog.setUniform("Material.Kd", 0.2f, 0.5f, 0.9f);
-        prog.setUniform("Material.Ks", 0.2f, 0.5f, 0.9f);
-        prog.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
-        prog.setUniform("Material.Shininess", 180.0f);
-        model = mat4(1.0f);
-        model = glm::translate(model, vec3(0.0f, -0.8f, -6.0f));
-        setMatrices(prog);
-        pond->render();
         
 
-        prog.setUniform("Light.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
-        prog.setUniform("Light.L", vec3(1.0f));
-        prog.setUniform("Light.La", vec3(0.6f));
 
 
 
-
-
+        //Swaps to animation shader
         aniProg.use();
         aniProg.setUniform("Time", time);
 
@@ -834,30 +778,6 @@ void SceneBasic_Uniform::pass1()
         plane.render();
 
 
-        edgeProg.setUniform("lights.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
-
-        edgeProg.setUniform("lights.L", vec3(0.627, 0.843f, 0.952f));
-
-        edgeProg.setUniform("lights.La", vec3(0.6f));
-
-        edgeProg.setUniform("texID", 4);
-        edgeProg.setUniform("Material.Kd", 0.2f, 0.5f, 0.9f);
-        edgeProg.setUniform("Material.Ks", 0.2f, 0.5f, 0.9f);
-        edgeProg.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
-        edgeProg.setUniform("Material.Shininess", 180.0f);
-        model = mat4(1.0f);
-        model = glm::translate(model, vec3(0.0f, -0.8f, -6.0f));
-        setMatrices(edgeProg);
-        pond->render();
-
-
-        edgeProg.setUniform("Light.Position", (view * glm::vec4(3.0f, 5.0f, 0.0, 0.0f)));
-        edgeProg.setUniform("Light.L", vec3(1.0f));
-        edgeProg.setUniform("Light.La", vec3(0.6f));
-
-
-
-
 
         aniProg.use();
         aniProg.setUniform("Time", time);
@@ -885,6 +805,7 @@ void SceneBasic_Uniform::pass1()
 
 }
 
+//Applies edge filter if edge shader is active, applies gauss blur to verticle pixels if gauss shader is active
 void SceneBasic_Uniform::pass2()
 {
 
@@ -901,7 +822,6 @@ void SceneBasic_Uniform::pass2()
         view = mat4(1.0f);
         projection = mat4(1.0f);
         setMatrices(prog);
-        // Render the full-screen quad
         glBindVertexArray(fsQuad);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -919,13 +839,13 @@ void SceneBasic_Uniform::pass2()
         view = mat4(1.0f);
         projection = mat4(1.0f);
         setMatrices(edgeProg);
-        // Render the full-screen quad
         glBindVertexArray(fsQuad);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
     }
 }
 
+//Applies gauss blur to horizontal pixels if gauss shader is active
 void SceneBasic_Uniform::pass3()
 {
     prog.setUniform("Pass", 3);

@@ -53,8 +53,6 @@ if(sDotN > 0.0)
 //Half Vector
 vec3 h = normalize(v+s);
 
-//Reflection Vector
-//vec3 r = reflect(-s,normal);
 
 //Calculate specular with Shininess
 specular = Material.Ks * pow(max(dot(h,normal),0.0), Material.Shininess);
@@ -67,6 +65,8 @@ return ambient + lights.L * (diffuse + specular);
 
 }
 
+
+//Same as basic(gauss) uniform
 void main() {
 
     FragColor = vec4 (blinnPhongModel(vec3(Position), normalize(Normal)),1.0);

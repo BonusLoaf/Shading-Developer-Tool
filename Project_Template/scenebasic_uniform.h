@@ -20,9 +20,9 @@
 
 #include "GLFW/glfw3.h"
 #include "GLFW/glfw3.h"
-#include <glm/glm.hpp> //includes GLM
+#include <glm/glm.hpp>
 #include "glm/fwd.hpp"
-#include <glm/gtc/type_ptr.hpp> // GLM: access to the value_ptr
+#include <glm/gtc/type_ptr.hpp>
 
 class SceneBasic_Uniform : public Scene
 {
@@ -30,13 +30,13 @@ private:
 
     glm::mat4 rotationMatrix;
 
-    GLSLProgram prog, edgeProg, aniProg;
+    GLSLProgram prog, edgeProg, aniProg, floraProg;
 
     GLuint fboHandle, fsQuad, renderFBO, intermediateFBO, renderTex, intermediateTex;
 
     float angle, tPrev, rotSpeed, time;
 
-    Plane plane, aniPlane;
+    Plane plane;
 
     void setMatrices(GLSLProgram& program);
 
@@ -52,6 +52,7 @@ private:
     float gauss(float, float);
 
     void activateEdgeShader();
+    void activateGaussShader();
 
 public:
     SceneBasic_Uniform(GLFWwindow* sceneRunnerWindow);
@@ -60,7 +61,6 @@ public:
     void update( float t );
     void render();
     void resize(int, int);
-    void controls();
 
 };
 
