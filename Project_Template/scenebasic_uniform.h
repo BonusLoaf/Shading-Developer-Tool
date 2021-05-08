@@ -8,10 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "helper/objmesh.h"
-#include "helper/skybox.h"
 #include <glm/glm.hpp>
-#include "helper/teapot.h"
-#include "helper/torus.h"
 #include "helper/plane.h"
 
 #include <imgui-1.79/imgui.h>
