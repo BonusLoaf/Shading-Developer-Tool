@@ -75,16 +75,10 @@
     <ClCompile Include="packages\imgui-1.79\examples\imgui_impl_glfw.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\2020-comp3016-cw2-Artizazel\packages\imgui-1.79\examples\imgui_impl_opengl3.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
-    <ClCompile Include="helper\torus.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
-    <ClCompile Include="helper\teapot.cpp">
-      <Filter>helper</Filter>
-    </ClCompile>
     <ClCompile Include="helper\plane.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
+    <ClCompile Include="packages\imgui-1.79\examples\imgui_impl_opengl3.cpp">
       <Filter>helper</Filter>
     </ClCompile>
   </ItemGroup>
@@ -158,12 +152,6 @@
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="packages\imgui-1.79\examples\imgui_impl_glfw.h">
-      <Filter>helper</Filter>
-    </ClInclude>
-    <ClInclude Include="helper\torus.h">
-      <Filter>helper</Filter>
-    </ClInclude>
-    <ClInclude Include="helper\teapot.h">
       <Filter>helper</Filter>
     </ClInclude>
     <ClInclude Include="helper\plane.h">

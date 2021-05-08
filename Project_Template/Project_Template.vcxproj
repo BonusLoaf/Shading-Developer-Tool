@@ -146,7 +146,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\2020-comp3016-cw2-Artizazel\packages\imgui-1.79\examples\imgui_impl_opengl3.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="helper\glslprogram.cpp" />
     <ClCompile Include="helper\glutils.cpp" />
@@ -154,12 +153,11 @@
     <ClCompile Include="helper\plane.cpp" />
     <ClCompile Include="helper\skybox.cpp" />
     <ClCompile Include="helper\stb\stb_image.cpp" />
-    <ClCompile Include="helper\teapot.cpp" />
     <ClCompile Include="helper\texture.cpp" />
-    <ClCompile Include="helper\torus.cpp" />
     <ClCompile Include="helper\trianglemesh.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="packages\imgui-1.79\examples\imgui_impl_glfw.cpp" />
+    <ClCompile Include="packages\imgui-1.79\examples\imgui_impl_opengl3.cpp" />
     <ClCompile Include="packages\imgui-1.79\imgui.cpp" />
     <ClCompile Include="packages\imgui-1.79\imgui_demo.cpp" />
     <ClCompile Include="packages\imgui-1.79\imgui_draw.cpp" />
@@ -187,10 +185,8 @@
     <ClInclude Include="helper\skybox.h" />
     <ClInclude Include="helper\stb\stb_image.h" />
     <ClInclude Include="helper\stb\stb_image_write.h" />
-    <ClInclude Include="helper\teapot.h" />
     <ClInclude Include="helper\teapotdata.h" />
     <ClInclude Include="helper\texture.h" />
-    <ClInclude Include="helper\torus.h" />
     <ClInclude Include="helper\trianglemesh.h" />
     <ClInclude Include="helper\utils.h" />
     <ClInclude Include="packages\imgui-1.79\examples\imgui_impl_glfw.h" />
